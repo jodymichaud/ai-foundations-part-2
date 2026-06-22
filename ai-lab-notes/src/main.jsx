@@ -86,6 +86,23 @@ const initialMedCleanDates = {
   rawMaterialsLab: '',
 };
 
+const monthNames = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+const weekdayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 function loadFromStorage(key, fallback) {
   try {
     const savedValue = localStorage.getItem(key);
@@ -104,6 +121,14 @@ function App() {
   const [medCleanDates, setMedCleanDates] = useState(() =>
     loadFromStorage('ai-lab-med-clean-dates', initialMedCleanDates),
   );
+  const [calendarDate, setCalendarDate] = useState(() => new Date());
+  const [calendarTasks, setCalendarTasks] = useState(() =>
+    loadFromStorage('ai-lab-calendar-tasks', {}),
+  );
+  const [calendarForm, setCalendarForm] = useState({
+    date: new Date().toISOString().slice(0, 10),
+    task: '',
+  });
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -121,11 +146,47 @@ function App() {
     );
   }, [medCleanDates]);
 
+  useEffect(() => {
+    localStorage.setItem(
+      'ai-lab-calendar-tasks',
+      JSON.stringify(calendarTasks),
+    );
+  }, [calendarTasks]);
+
   const completedCount = checkedItems.length;
+  const calendarYear = calendarDate.getFullYear();
+  const calendarMonth = calendarDate.getMonth();
+  const calendarTitle = `${monthNames[calendarMonth]} ${calendarYear}`;
 
   const sortedNotes = useMemo(() => {
     return [...notes].sort((first, second) => second.createdAt - first.createdAt);
   }, [notes]);
+
+  const calendarDays = useMemo(() => {
+    const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+    const totalDays = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const days = [];
+
+    for (let index = 0; index < firstDay; index += 1) {
+      days.push(null);
+    }
+
+    for (let day = 1; day <= totalDays; day += 1) {
+      const dateKey = [
+        calendarYear,
+        String(calendarMonth + 1).padStart(2, '0'),
+        String(day).padStart(2, '0'),
+      ].join('-');
+
+      days.push({
+        day,
+        dateKey,
+        tasks: calendarTasks[dateKey] || [],
+      });
+    }
+
+    return days;
+  }, [calendarMonth, calendarTasks, calendarYear]);
 
   function toggleChecklistItem(item) {
     setCheckedItems((currentItems) => {
@@ -187,6 +248,71 @@ function App() {
     setMedCleanDates(initialMedCleanDates);
   }
 
+  function goToPreviousMonth() {
+    setCalendarDate((currentDate) => {
+      return new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+    });
+  }
+
+  function goToNextMonth() {
+    setCalendarDate((currentDate) => {
+      return new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+    });
+  }
+
+  function updateCalendarForm(event) {
+    const { name, value } = event.target;
+    setCalendarForm((currentForm) => ({
+      ...currentForm,
+      [name]: value,
+    }));
+  }
+
+  function addCalendarTask(event) {
+    event.preventDefault();
+
+    if (calendarForm.date.trim() === '' || calendarForm.task.trim() === '') {
+      return;
+    }
+
+    const newTask = {
+      id: crypto.randomUUID(),
+      text: calendarForm.task.trim(),
+    };
+
+    setCalendarTasks((currentTasks) => {
+      const tasksForDate = currentTasks[calendarForm.date] || [];
+      return {
+        ...currentTasks,
+        [calendarForm.date]: [...tasksForDate, newTask],
+      };
+    });
+
+    setCalendarDate(new Date(`${calendarForm.date}T00:00:00`));
+    setCalendarForm((currentForm) => ({
+      ...currentForm,
+      task: '',
+    }));
+  }
+
+  function deleteCalendarTask(dateKey, taskId) {
+    setCalendarTasks((currentTasks) => {
+      const remainingTasks = (currentTasks[dateKey] || []).filter((task) => {
+        return task.id !== taskId;
+      });
+
+      if (remainingTasks.length === 0) {
+        const { [dateKey]: removedDate, ...otherDates } = currentTasks;
+        return otherDates;
+      }
+
+      return {
+        ...currentTasks,
+        [dateKey]: remainingTasks,
+      };
+    });
+  }
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -221,6 +347,98 @@ function App() {
               <span>{item}</span>
             </label>
           ))}
+        </div>
+      </section>
+
+      <section className="card">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Monthly planning</p>
+            <h2>Task Calendar</h2>
+          </div>
+          <div className="calendar-controls">
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={goToPreviousMonth}
+            >
+              Previous
+            </button>
+            <span>{calendarTitle}</span>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={goToNextMonth}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <form className="calendar-form" onSubmit={addCalendarTask}>
+          <label>
+            Task Date
+            <input
+              type="date"
+              name="date"
+              value={calendarForm.date}
+              onChange={updateCalendarForm}
+              required
+            />
+          </label>
+          <label>
+            Task
+            <input
+              type="text"
+              name="task"
+              value={calendarForm.task}
+              onChange={updateCalendarForm}
+              placeholder="Example: Review lab notes"
+              required
+            />
+          </label>
+          <button className="primary-button" type="submit">
+            Add Task
+          </button>
+        </form>
+
+        <div className="calendar-grid">
+          {weekdayNames.map((weekday) => (
+            <div className="calendar-weekday" key={weekday}>
+              {weekday}
+            </div>
+          ))}
+
+          {calendarDays.map((day, index) => {
+            if (!day) {
+              return (
+                <div
+                  className="calendar-day calendar-day-empty"
+                  key={`empty-${index}`}
+                />
+              );
+            }
+
+            return (
+              <div className="calendar-day" key={day.dateKey}>
+                <span className="calendar-day-number">{day.day}</span>
+                <div className="calendar-task-list">
+                  {day.tasks.map((task) => (
+                    <div className="calendar-task" key={task.id}>
+                      <span>{task.text}</span>
+                      <button
+                        type="button"
+                        onClick={() => deleteCalendarTask(day.dateKey, task.id)}
+                        aria-label={`Delete task ${task.text}`}
+                      >
+                        x
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 

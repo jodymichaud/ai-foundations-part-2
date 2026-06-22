@@ -315,6 +315,107 @@ textarea:focus {
   max-width: 180px;
 }
 
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calendar-controls span {
+  min-width: 150px;
+  color: #47375f;
+  font-weight: 800;
+  text-align: center;
+}
+
+.calendar-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(240px, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+
+.calendar-form label {
+  display: grid;
+  gap: 7px;
+  color: #463856;
+  font-weight: 700;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border: 1px solid #ded3ef;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.calendar-weekday {
+  padding: 10px;
+  color: #47375f;
+  background: #f7f2ff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.calendar-day {
+  min-height: 128px;
+  border-top: 1px solid #e4d9f2;
+  border-right: 1px solid #e4d9f2;
+  padding: 9px;
+  background: #fffcff;
+}
+
+.calendar-day:nth-child(7n + 14) {
+  border-right: 0;
+}
+
+.calendar-day-empty {
+  background: #fbf8ff;
+}
+
+.calendar-day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: #5f438f;
+  background: #f3ecff;
+  font-weight: 800;
+}
+
+.calendar-task-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.calendar-task {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid #d8c9ef;
+  border-radius: 7px;
+  padding: 7px;
+  background: #f8f3ff;
+  color: #33283f;
+  font-size: 0.9rem;
+}
+
+.calendar-task button {
+  border: 0;
+  padding: 0 4px;
+  color: #8a2d2d;
+  background: transparent;
+  font-weight: 900;
+}
+
 dl {
   display: grid;
   gap: 10px;
@@ -365,6 +466,10 @@ dd {
   .content-grid {
     grid-template-columns: 1fr;
   }
+
+  .calendar-form {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -384,6 +489,16 @@ dd {
     flex-direction: column;
   }
 
+  .calendar-controls {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .calendar-controls span {
+    min-width: 0;
+  }
+
   .checklist-grid,
   .lab-form,
   .med-clean-list,
@@ -394,5 +509,20 @@ dd {
   th,
   td {
     padding: 10px;
+  }
+
+  .calendar-grid {
+    display: block;
+  }
+
+  .calendar-weekday,
+  .calendar-day-empty {
+    display: none;
+  }
+
+  .calendar-day {
+    min-height: auto;
+    border-right: 0;
+    padding: 12px;
   }
 }
