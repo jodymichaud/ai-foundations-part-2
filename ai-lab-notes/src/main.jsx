@@ -550,54 +550,6 @@ function App() {
         </div>
       </section>
 
-      <section className="card">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Learning notes</p>
-            <h2>Beginner Notes / How This App Works</h2>
-          </div>
-        </div>
-        <div className="learning-grid">
-          <article>
-            <h3>What Vite is</h3>
-            <p>
-              Vite is a development tool that starts a fast local web server and
-              prepares your app for production builds.
-            </p>
-          </article>
-          <article>
-            <h3>What React components are</h3>
-            <p>
-              React components are reusable pieces of the screen. This app uses
-              components and data lists to build the calendar, form, med clean
-              tracker, and saved notes log.
-            </p>
-          </article>
-          <article>
-            <h3>What localStorage does</h3>
-            <p>
-              localStorage saves small pieces of data in your browser, so the
-              calendar tasks, med clean dates, and fictional notes stay after a
-              page refresh.
-            </p>
-          </article>
-          <article>
-            <h3>Why there is no database</h3>
-            <p>
-              This beginner app keeps data on one computer in one browser. That
-              makes it simpler and avoids accounts, servers, passwords, and
-              private data.
-            </p>
-          </article>
-          <article>
-            <h3>How it could grow later</h3>
-            <p>
-              Later versions could add search, filters, export to CSV, charts,
-              user accounts, or a real database after the basics are clear.
-            </p>
-          </article>
-        </div>
-      </section>
     </main>
   );
 }
