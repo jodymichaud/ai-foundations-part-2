@@ -282,8 +282,7 @@ function App() {
                 required
               >
                 <option value="">Choose a shift</option>
-                <option>Morning</option>
-                <option>Afternoon</option>
+                <option>Day</option>
                 <option>Night</option>
               </select>
             </label>
