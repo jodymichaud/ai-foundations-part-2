@@ -74,30 +74,10 @@ const commands = [
 const initialForm = {
   date: '',
   shift: '',
-  productName: '',
-  inspectionType: '',
   observation: '',
-  issueCategory: '',
-  actionTaken: '',
   followUpNeeded: '',
   initials: '',
 };
-
-const inspectionTypes = [
-  'Foam Inspection',
-  'Paper Inspection',
-  'Thickness Check',
-  'Visual Review',
-  'Rework Review',
-];
-
-const issueCategories = [
-  'Paper Defect',
-  'Foam Surface',
-  'Documentation',
-  'Equipment',
-  'Other',
-];
 
 const initialMedCleanDates = {
   foamLab: '',
@@ -308,33 +288,6 @@ function App() {
               </select>
             </label>
 
-            <label>
-              Product / Material Name
-              <input
-                type="text"
-                name="productName"
-                value={formData.productName}
-                onChange={updateFormField}
-                placeholder="Example: Sample Foam Roll A"
-                required
-              />
-            </label>
-
-            <label>
-              Inspection Type
-              <select
-                name="inspectionType"
-                value={formData.inspectionType}
-                onChange={updateFormField}
-                required
-              >
-                <option value="">Choose an inspection</option>
-                {inspectionTypes.map((type) => (
-                  <option key={type}>{type}</option>
-                ))}
-              </select>
-            </label>
-
             <label className="wide-field">
               Observation
               <textarea
@@ -345,21 +298,6 @@ function App() {
                 rows="4"
                 required
               />
-            </label>
-
-            <label>
-              Issue Category
-              <select
-                name="issueCategory"
-                value={formData.issueCategory}
-                onChange={updateFormField}
-                required
-              >
-                <option value="">Choose a category</option>
-                {issueCategories.map((category) => (
-                  <option key={category}>{category}</option>
-                ))}
-              </select>
             </label>
 
             <label>
@@ -374,18 +312,6 @@ function App() {
                 <option>Yes</option>
                 <option>No</option>
               </select>
-            </label>
-
-            <label className="wide-field">
-              Action Taken
-              <textarea
-                name="actionTaken"
-                value={formData.actionTaken}
-                onChange={updateFormField}
-                placeholder="Example: Logged item for fictional rework review."
-                rows="3"
-                required
-              />
             </label>
 
             <label>
@@ -435,7 +361,7 @@ function App() {
                 <article className="note-card" key={note.id}>
                   <div className="note-card-header">
                     <div>
-                      <h3>{note.productName}</h3>
+                      <h3>Lab note</h3>
                       <p>
                         {note.date} | {note.shift} | {note.initials}
                       </p>
@@ -450,20 +376,8 @@ function App() {
                   </div>
                   <dl>
                     <div>
-                      <dt>Inspection</dt>
-                      <dd>{note.inspectionType}</dd>
-                    </div>
-                    <div>
-                      <dt>Category</dt>
-                      <dd>{note.issueCategory}</dd>
-                    </div>
-                    <div>
                       <dt>Observation</dt>
                       <dd>{note.observation}</dd>
-                    </div>
-                    <div>
-                      <dt>Action</dt>
-                      <dd>{note.actionTaken}</dd>
                     </div>
                     <div>
                       <dt>Follow-up</dt>
