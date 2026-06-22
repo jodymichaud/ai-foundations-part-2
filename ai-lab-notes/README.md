@@ -1,17 +1,17 @@
 # AI Lab Notes
 
-AI Lab Notes is a beginner-friendly Vite and React web app for practicing basic web development, Git, and fictional QA-style documentation.
+AI Lab Notes is a beginner-friendly Vite and React web app for practicing basic web development and fictional QA-style documentation.
 
 The app is intentionally small and local-only. It does not use external APIs, passwords, tokens, private data, real company data, paid services, or a backend database.
 
 ## What the App Includes
 
-- A project setup checklist that saves progress in `localStorage`
-- A Linux/Git command cheat sheet for beginner terminal practice
+- A monthly task calendar that saves tasks in `localStorage`
 - A fictional QA lab notes form with required fields and simple dropdowns
 - A saved notes log stored in the browser
 - Delete controls for individual notes
 - A clear-all control for saved notes
+- A med clean date tracker
 - Beginner notes explaining Vite, React components, and `localStorage`
 
 ## Install Steps
@@ -90,6 +90,6 @@ Vercel can host the built frontend app. This project does not require a server, 
 
 ## Safety and Privacy Notes
 
-This app stores checklist progress and fictional lab notes in browser `localStorage`. The data stays in the browser on the current device unless you clear it.
+This app stores calendar tasks, med clean dates, and fictional lab notes in browser `localStorage`. The data stays in the browser on the current device unless you clear it.
 
 Do not enter real company data, private information, passwords, tokens, customer details, or regulated lab records into this practice app.

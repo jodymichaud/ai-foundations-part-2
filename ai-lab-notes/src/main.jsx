@@ -2,75 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
-const checklistItems = [
-  'Open project folder',
-  'Install dependencies',
-  'Start development server',
-  'Make first code change',
-  'Check the app in browser',
-  'Commit changes with Git',
-  'Push to GitHub',
-  'Deploy to Vercel',
-];
-
-const commands = [
-  {
-    command: 'pwd',
-    does: 'Shows the folder you are currently working in.',
-    use: 'Use it when you feel lost in the terminal.',
-  },
-  {
-    command: 'ls',
-    does: 'Lists files and folders.',
-    use: 'Use it to see what is inside the current folder.',
-  },
-  {
-    command: 'cd',
-    does: 'Changes folders.',
-    use: 'Use it to move into your project folder.',
-  },
-  {
-    command: 'mkdir',
-    does: 'Creates a new folder.',
-    use: 'Use it when you need a new project or notes folder.',
-  },
-  {
-    command: 'touch',
-    does: 'Creates a new empty file.',
-    use: 'Use it when you need a new file like README.md.',
-  },
-  {
-    command: 'npm install',
-    does: 'Installs project dependencies.',
-    use: 'Run it after cloning or creating a Vite app.',
-  },
-  {
-    command: 'npm run dev',
-    does: 'Starts the local development server.',
-    use: 'Run it when you want to view the app in your browser.',
-  },
-  {
-    command: 'git status',
-    does: 'Shows changed, staged, and untracked files.',
-    use: 'Run it before commits so you know what Git sees.',
-  },
-  {
-    command: 'git add .',
-    does: 'Stages all current file changes.',
-    use: 'Run it when you are ready to include changes in a commit.',
-  },
-  {
-    command: 'git commit -m "message"',
-    does: 'Saves staged changes to Git history.',
-    use: 'Use a short message that explains what changed.',
-  },
-  {
-    command: 'git push',
-    does: 'Uploads commits to GitHub.',
-    use: 'Run it after committing when you want GitHub updated.',
-  },
-];
-
 const initialForm = {
   date: '',
   shift: '',
@@ -113,9 +44,6 @@ function loadFromStorage(key, fallback) {
 }
 
 function App() {
-  const [checkedItems, setCheckedItems] = useState(() =>
-    loadFromStorage('ai-lab-checklist', []),
-  );
   const [formData, setFormData] = useState(initialForm);
   const [notes, setNotes] = useState(() => loadFromStorage('ai-lab-notes', []));
   const [medCleanDates, setMedCleanDates] = useState(() =>
@@ -130,10 +58,6 @@ function App() {
     task: '',
   });
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    localStorage.setItem('ai-lab-checklist', JSON.stringify(checkedItems));
-  }, [checkedItems]);
 
   useEffect(() => {
     localStorage.setItem('ai-lab-notes', JSON.stringify(notes));
@@ -153,7 +77,6 @@ function App() {
     );
   }, [calendarTasks]);
 
-  const completedCount = checkedItems.length;
   const calendarYear = calendarDate.getFullYear();
   const calendarMonth = calendarDate.getMonth();
   const calendarTitle = `${monthNames[calendarMonth]} ${calendarYear}`;
@@ -187,16 +110,6 @@ function App() {
 
     return days;
   }, [calendarMonth, calendarTasks, calendarYear]);
-
-  function toggleChecklistItem(item) {
-    setCheckedItems((currentItems) => {
-      if (currentItems.includes(item)) {
-        return currentItems.filter((savedItem) => savedItem !== item);
-      }
-
-      return [...currentItems, item];
-    });
-  }
 
   function updateFormField(event) {
     const { name, value } = event.target;
@@ -329,30 +242,6 @@ function App() {
       <section className="card">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Project setup</p>
-            <h2>Setup Checklist</h2>
-          </div>
-          <span className="progress-pill">
-            {completedCount} of {checklistItems.length} done
-          </span>
-        </div>
-        <div className="checklist-grid">
-          {checklistItems.map((item) => (
-            <label className="checklist-item" key={item}>
-              <input
-                type="checkbox"
-                checked={checkedItems.includes(item)}
-                onChange={() => toggleChecklistItem(item)}
-              />
-              <span>{item}</span>
-            </label>
-          ))}
-        </div>
-      </section>
-
-      <section className="card">
-        <div className="section-heading">
-          <div>
             <p className="eyebrow">Monthly planning</p>
             <h2>Task Calendar</h2>
           </div>
@@ -439,37 +328,6 @@ function App() {
               </div>
             );
           })}
-        </div>
-      </section>
-
-      <section className="card">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Terminal basics</p>
-            <h2>Linux/Git Command Cheat Sheet</h2>
-          </div>
-        </div>
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Command</th>
-                <th>What it does</th>
-                <th>When to use it</th>
-              </tr>
-            </thead>
-            <tbody>
-              {commands.map((item) => (
-                <tr key={item.command}>
-                  <td>
-                    <code>{item.command}</code>
-                  </td>
-                  <td>{item.does}</td>
-                  <td>{item.use}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </section>
 
@@ -711,15 +569,16 @@ function App() {
             <h3>What React components are</h3>
             <p>
               React components are reusable pieces of the screen. This app uses
-              components and data lists to build the checklist, table, form, and
-              saved notes log.
+              components and data lists to build the calendar, form, med clean
+              tracker, and saved notes log.
             </p>
           </article>
           <article>
             <h3>What localStorage does</h3>
             <p>
               localStorage saves small pieces of data in your browser, so the
-              checklist and fictional notes stay after a page refresh.
+              calendar tasks, med clean dates, and fictional notes stay after a
+              page refresh.
             </p>
           </article>
           <article>
