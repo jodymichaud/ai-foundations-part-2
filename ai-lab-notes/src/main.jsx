@@ -1,0 +1,504 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import './styles.css';
+
+const checklistItems = [
+  'Open project folder',
+  'Install dependencies',
+  'Start development server',
+  'Make first code change',
+  'Check the app in browser',
+  'Commit changes with Git',
+  'Push to GitHub',
+  'Deploy to Vercel',
+];
+
+const commands = [
+  {
+    command: 'pwd',
+    does: 'Shows the folder you are currently working in.',
+    use: 'Use it when you feel lost in the terminal.',
+  },
+  {
+    command: 'ls',
+    does: 'Lists files and folders.',
+    use: 'Use it to see what is inside the current folder.',
+  },
+  {
+    command: 'cd',
+    does: 'Changes folders.',
+    use: 'Use it to move into your project folder.',
+  },
+  {
+    command: 'mkdir',
+    does: 'Creates a new folder.',
+    use: 'Use it when you need a new project or notes folder.',
+  },
+  {
+    command: 'touch',
+    does: 'Creates a new empty file.',
+    use: 'Use it when you need a new file like README.md.',
+  },
+  {
+    command: 'npm install',
+    does: 'Installs project dependencies.',
+    use: 'Run it after cloning or creating a Vite app.',
+  },
+  {
+    command: 'npm run dev',
+    does: 'Starts the local development server.',
+    use: 'Run it when you want to view the app in your browser.',
+  },
+  {
+    command: 'git status',
+    does: 'Shows changed, staged, and untracked files.',
+    use: 'Run it before commits so you know what Git sees.',
+  },
+  {
+    command: 'git add .',
+    does: 'Stages all current file changes.',
+    use: 'Run it when you are ready to include changes in a commit.',
+  },
+  {
+    command: 'git commit -m "message"',
+    does: 'Saves staged changes to Git history.',
+    use: 'Use a short message that explains what changed.',
+  },
+  {
+    command: 'git push',
+    does: 'Uploads commits to GitHub.',
+    use: 'Run it after committing when you want GitHub updated.',
+  },
+];
+
+const initialForm = {
+  date: '',
+  shift: '',
+  productName: '',
+  inspectionType: '',
+  observation: '',
+  issueCategory: '',
+  actionTaken: '',
+  followUpNeeded: '',
+  initials: '',
+};
+
+const inspectionTypes = [
+  'Foam Inspection',
+  'Paper Inspection',
+  'Thickness Check',
+  'Visual Review',
+  'Rework Review',
+];
+
+const issueCategories = [
+  'Paper Defect',
+  'Foam Surface',
+  'Documentation',
+  'Equipment',
+  'Other',
+];
+
+function loadFromStorage(key, fallback) {
+  try {
+    const savedValue = localStorage.getItem(key);
+    return savedValue ? JSON.parse(savedValue) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function App() {
+  const [checkedItems, setCheckedItems] = useState(() =>
+    loadFromStorage('ai-lab-checklist', []),
+  );
+  const [formData, setFormData] = useState(initialForm);
+  const [notes, setNotes] = useState(() => loadFromStorage('ai-lab-notes', []));
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('ai-lab-checklist', JSON.stringify(checkedItems));
+  }, [checkedItems]);
+
+  useEffect(() => {
+    localStorage.setItem('ai-lab-notes', JSON.stringify(notes));
+  }, [notes]);
+
+  const completedCount = checkedItems.length;
+
+  const sortedNotes = useMemo(() => {
+    return [...notes].sort((first, second) => second.createdAt - first.createdAt);
+  }, [notes]);
+
+  function toggleChecklistItem(item) {
+    setCheckedItems((currentItems) => {
+      if (currentItems.includes(item)) {
+        return currentItems.filter((savedItem) => savedItem !== item);
+      }
+
+      return [...currentItems, item];
+    });
+  }
+
+  function updateFormField(event) {
+    const { name, value } = event.target;
+    setFormData((currentData) => ({
+      ...currentData,
+      [name]: value,
+    }));
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    const requiredFields = Object.entries(formData);
+    const hasBlankField = requiredFields.some(([, value]) => value.trim() === '');
+
+    if (hasBlankField) {
+      setError('Please complete every field before saving the lab note.');
+      return;
+    }
+
+    const newNote = {
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      ...formData,
+    };
+
+    setNotes((currentNotes) => [...currentNotes, newNote]);
+    setFormData(initialForm);
+    setError('');
+  }
+
+  function deleteNote(noteId) {
+    setNotes((currentNotes) => currentNotes.filter((note) => note.id !== noteId));
+  }
+
+  function clearNotes() {
+    setNotes([]);
+  }
+
+  return (
+    <main className="app-shell">
+      <header className="app-header">
+        <div>
+          <p className="eyebrow">Beginner web development practice</p>
+          <h1>AI Lab Notes</h1>
+          <p className="header-copy">
+            A small local-only QA learning app for practicing React, Git, and
+            lab-style documentation.
+          </p>
+        </div>
+      </header>
+
+      <section className="card">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Project setup</p>
+            <h2>Setup Checklist</h2>
+          </div>
+          <span className="progress-pill">
+            {completedCount} of {checklistItems.length} done
+          </span>
+        </div>
+        <div className="checklist-grid">
+          {checklistItems.map((item) => (
+            <label className="checklist-item" key={item}>
+              <input
+                type="checkbox"
+                checked={checkedItems.includes(item)}
+                onChange={() => toggleChecklistItem(item)}
+              />
+              <span>{item}</span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <section className="card">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Terminal basics</p>
+            <h2>Linux/Git Command Cheat Sheet</h2>
+          </div>
+        </div>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Command</th>
+                <th>What it does</th>
+                <th>When to use it</th>
+              </tr>
+            </thead>
+            <tbody>
+              {commands.map((item) => (
+                <tr key={item.command}>
+                  <td>
+                    <code>{item.command}</code>
+                  </td>
+                  <td>{item.does}</td>
+                  <td>{item.use}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="content-grid">
+        <section className="card">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Fictional practice data</p>
+              <h2>Fictional QA Lab Notes Form</h2>
+            </div>
+          </div>
+          <form className="lab-form" onSubmit={handleSubmit}>
+            <label>
+              Date
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={updateFormField}
+                required
+              />
+            </label>
+
+            <label>
+              Shift
+              <select
+                name="shift"
+                value={formData.shift}
+                onChange={updateFormField}
+                required
+              >
+                <option value="">Choose a shift</option>
+                <option>Morning</option>
+                <option>Afternoon</option>
+                <option>Night</option>
+              </select>
+            </label>
+
+            <label>
+              Product / Material Name
+              <input
+                type="text"
+                name="productName"
+                value={formData.productName}
+                onChange={updateFormField}
+                placeholder="Example: Sample Foam Roll A"
+                required
+              />
+            </label>
+
+            <label>
+              Inspection Type
+              <select
+                name="inspectionType"
+                value={formData.inspectionType}
+                onChange={updateFormField}
+                required
+              >
+                <option value="">Choose an inspection</option>
+                {inspectionTypes.map((type) => (
+                  <option key={type}>{type}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="wide-field">
+              Observation
+              <textarea
+                name="observation"
+                value={formData.observation}
+                onChange={updateFormField}
+                placeholder="Write a short fictional observation."
+                rows="4"
+                required
+              />
+            </label>
+
+            <label>
+              Issue Category
+              <select
+                name="issueCategory"
+                value={formData.issueCategory}
+                onChange={updateFormField}
+                required
+              >
+                <option value="">Choose a category</option>
+                {issueCategories.map((category) => (
+                  <option key={category}>{category}</option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Follow-Up Needed
+              <select
+                name="followUpNeeded"
+                value={formData.followUpNeeded}
+                onChange={updateFormField}
+                required
+              >
+                <option value="">Choose yes or no</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </label>
+
+            <label className="wide-field">
+              Action Taken
+              <textarea
+                name="actionTaken"
+                value={formData.actionTaken}
+                onChange={updateFormField}
+                placeholder="Example: Logged item for fictional rework review."
+                rows="3"
+                required
+              />
+            </label>
+
+            <label>
+              Initials
+              <input
+                type="text"
+                name="initials"
+                value={formData.initials}
+                onChange={updateFormField}
+                placeholder="Example: JM"
+                maxLength="4"
+                required
+              />
+            </label>
+
+            {error && <p className="form-error">{error}</p>}
+
+            <button className="primary-button" type="submit">
+              Save Fictional Note
+            </button>
+          </form>
+        </section>
+
+        <section className="card">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Local browser storage</p>
+              <h2>Saved Notes Log</h2>
+            </div>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={clearNotes}
+              disabled={notes.length === 0}
+            >
+              Clear All
+            </button>
+          </div>
+
+          {sortedNotes.length === 0 ? (
+            <p className="empty-state">
+              No fictional notes saved yet. Complete the form to add one.
+            </p>
+          ) : (
+            <div className="notes-list">
+              {sortedNotes.map((note) => (
+                <article className="note-card" key={note.id}>
+                  <div className="note-card-header">
+                    <div>
+                      <h3>{note.productName}</h3>
+                      <p>
+                        {note.date} | {note.shift} | {note.initials}
+                      </p>
+                    </div>
+                    <button
+                      className="danger-button"
+                      type="button"
+                      onClick={() => deleteNote(note.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>Inspection</dt>
+                      <dd>{note.inspectionType}</dd>
+                    </div>
+                    <div>
+                      <dt>Category</dt>
+                      <dd>{note.issueCategory}</dd>
+                    </div>
+                    <div>
+                      <dt>Observation</dt>
+                      <dd>{note.observation}</dd>
+                    </div>
+                    <div>
+                      <dt>Action</dt>
+                      <dd>{note.actionTaken}</dd>
+                    </div>
+                    <div>
+                      <dt>Follow-up</dt>
+                      <dd>{note.followUpNeeded}</dd>
+                    </div>
+                  </dl>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </section>
+
+      <section className="card">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Learning notes</p>
+            <h2>Beginner Notes / How This App Works</h2>
+          </div>
+        </div>
+        <div className="learning-grid">
+          <article>
+            <h3>What Vite is</h3>
+            <p>
+              Vite is a development tool that starts a fast local web server and
+              prepares your app for production builds.
+            </p>
+          </article>
+          <article>
+            <h3>What React components are</h3>
+            <p>
+              React components are reusable pieces of the screen. This app uses
+              components and data lists to build the checklist, table, form, and
+              saved notes log.
+            </p>
+          </article>
+          <article>
+            <h3>What localStorage does</h3>
+            <p>
+              localStorage saves small pieces of data in your browser, so the
+              checklist and fictional notes stay after a page refresh.
+            </p>
+          </article>
+          <article>
+            <h3>Why there is no database</h3>
+            <p>
+              This beginner app keeps data on one computer in one browser. That
+              makes it simpler and avoids accounts, servers, passwords, and
+              private data.
+            </p>
+          </article>
+          <article>
+            <h3>How it could grow later</h3>
+            <p>
+              Later versions could add search, filters, export to CSV, charts,
+              user accounts, or a real database after the basics are clear.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+createRoot(document.getElementById('root')).render(<App />);

@@ -1,0 +1,5 @@
+{
+  "installCommand": "cd ai-lab-notes && npm install",
+  "buildCommand": "cd ai-lab-notes && npm run build",
+  "outputDirectory": "ai-lab-notes/dist"
+}
