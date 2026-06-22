@@ -99,8 +99,9 @@ const issueCategories = [
   'Other',
 ];
 
-const initialMedCleanForm = {
-  date: '',
+const initialMedCleanDates = {
+  foamLab: '',
+  rawMaterialsLab: '',
 };
 
 function loadFromStorage(key, fallback) {
@@ -118,12 +119,10 @@ function App() {
   );
   const [formData, setFormData] = useState(initialForm);
   const [notes, setNotes] = useState(() => loadFromStorage('ai-lab-notes', []));
-  const [medCleanForm, setMedCleanForm] = useState(initialMedCleanForm);
-  const [medCleans, setMedCleans] = useState(() =>
-    loadFromStorage('ai-lab-med-cleans', []),
+  const [medCleanDates, setMedCleanDates] = useState(() =>
+    loadFromStorage('ai-lab-med-clean-dates', initialMedCleanDates),
   );
   const [error, setError] = useState('');
-  const [medCleanError, setMedCleanError] = useState('');
 
   useEffect(() => {
     localStorage.setItem('ai-lab-checklist', JSON.stringify(checkedItems));
@@ -134,20 +133,17 @@ function App() {
   }, [notes]);
 
   useEffect(() => {
-    localStorage.setItem('ai-lab-med-cleans', JSON.stringify(medCleans));
-  }, [medCleans]);
+    localStorage.setItem(
+      'ai-lab-med-clean-dates',
+      JSON.stringify(medCleanDates),
+    );
+  }, [medCleanDates]);
 
   const completedCount = checkedItems.length;
 
   const sortedNotes = useMemo(() => {
     return [...notes].sort((first, second) => second.createdAt - first.createdAt);
   }, [notes]);
-
-  const sortedMedCleans = useMemo(() => {
-    return [...medCleans].sort((first, second) => {
-      return second.date.localeCompare(first.date);
-    });
-  }, [medCleans]);
 
   function toggleChecklistItem(item) {
     setCheckedItems((currentItems) => {
@@ -198,36 +194,15 @@ function App() {
   }
 
   function updateMedCleanDate(event) {
-    setMedCleanForm({ date: event.target.value });
+    const { name, value } = event.target;
+    setMedCleanDates((currentDates) => ({
+      ...currentDates,
+      [name]: value,
+    }));
   }
 
-  function handleMedCleanSubmit(event) {
-    event.preventDefault();
-
-    if (medCleanForm.date.trim() === '') {
-      setMedCleanError('Please choose a date before saving a med clean.');
-      return;
-    }
-
-    const newMedClean = {
-      id: crypto.randomUUID(),
-      date: medCleanForm.date,
-      createdAt: Date.now(),
-    };
-
-    setMedCleans((currentMedCleans) => [...currentMedCleans, newMedClean]);
-    setMedCleanForm(initialMedCleanForm);
-    setMedCleanError('');
-  }
-
-  function deleteMedClean(medCleanId) {
-    setMedCleans((currentMedCleans) =>
-      currentMedCleans.filter((medClean) => medClean.id !== medCleanId),
-    );
-  }
-
-  function clearMedCleans() {
-    setMedCleans([]);
+  function clearMedCleanDates() {
+    setMedCleanDates(initialMedCleanDates);
   }
 
   return (
@@ -511,54 +486,43 @@ function App() {
           <button
             className="secondary-button"
             type="button"
-            onClick={clearMedCleans}
-            disabled={medCleans.length === 0}
+            onClick={clearMedCleanDates}
+            disabled={
+              medCleanDates.foamLab === '' &&
+              medCleanDates.rawMaterialsLab === ''
+            }
           >
-            Clear All
+            Clear Dates
           </button>
         </div>
 
-        <form className="med-clean-form" onSubmit={handleMedCleanSubmit}>
-          <label>
-            Completion Date
+        <div className="med-clean-list">
+          <label className="med-clean-item">
+            <span>
+              <strong>Foam Lab Med Clean</strong>
+              <small>Date completed</small>
+            </span>
             <input
               type="date"
-              name="medCleanDate"
-              value={medCleanForm.date}
+              name="foamLab"
+              value={medCleanDates.foamLab}
               onChange={updateMedCleanDate}
-              required
             />
           </label>
-          <button className="primary-button" type="submit">
-            Add Completed Med Clean
-          </button>
-          {medCleanError && <p className="form-error">{medCleanError}</p>}
-        </form>
 
-        {sortedMedCleans.length === 0 ? (
-          <p className="empty-state med-clean-empty">
-            No med cleans have been saved yet. Add a completion date to start
-            the log.
-          </p>
-        ) : (
-          <div className="med-clean-list">
-            {sortedMedCleans.map((medClean) => (
-              <article className="med-clean-item" key={medClean.id}>
-                <div>
-                  <h3>Med clean completed</h3>
-                  <p>{medClean.date}</p>
-                </div>
-                <button
-                  className="danger-button"
-                  type="button"
-                  onClick={() => deleteMedClean(medClean.id)}
-                >
-                  Delete
-                </button>
-              </article>
-            ))}
-          </div>
-        )}
+          <label className="med-clean-item">
+            <span>
+              <strong>Raw Materials Lab Med Clean</strong>
+              <small>Date completed</small>
+            </span>
+            <input
+              type="date"
+              name="rawMaterialsLab"
+              value={medCleanDates.rawMaterialsLab}
+              onChange={updateMedCleanDate}
+            />
+          </label>
+        </div>
       </section>
 
       <section className="card">
