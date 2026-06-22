@@ -75,7 +75,9 @@ const initialForm = {
   date: '',
   shift: '',
   observation: '',
-  followUpNeeded: '',
+  issuesNonconformances: '',
+  shiftHuddles: '',
+  followUpNotes: '',
   initials: '',
 };
 
@@ -299,18 +301,40 @@ function App() {
               />
             </label>
 
-            <label>
-              Follow-Up Needed
-              <select
-                name="followUpNeeded"
-                value={formData.followUpNeeded}
+            <label className="wide-field">
+              Issues &amp; Nonconformances
+              <textarea
+                name="issuesNonconformances"
+                value={formData.issuesNonconformances}
                 onChange={updateFormField}
+                placeholder="List any issues, nonconformances, or write N/A."
+                rows="3"
                 required
-              >
-                <option value="">Choose yes or no</option>
-                <option>Yes</option>
-                <option>No</option>
-              </select>
+              />
+            </label>
+
+            <label className="wide-field">
+              Discussed at Shift Huddles
+              <textarea
+                name="shiftHuddles"
+                value={formData.shiftHuddles}
+                onChange={updateFormField}
+                placeholder="Write what was discussed during shift huddles."
+                rows="3"
+                required
+              />
+            </label>
+
+            <label className="wide-field">
+              Follow Up Needed
+              <textarea
+                name="followUpNotes"
+                value={formData.followUpNotes}
+                onChange={updateFormField}
+                placeholder="List follow-up items or write N/A."
+                rows="3"
+                required
+              />
             </label>
 
             <label>
@@ -379,8 +403,20 @@ function App() {
                       <dd>{note.observation}</dd>
                     </div>
                     <div>
-                      <dt>Follow-up</dt>
-                      <dd>{note.followUpNeeded}</dd>
+                      <dt>Issues &amp; Nonconformances</dt>
+                      <dd>{note.issuesNonconformances || 'Not listed'}</dd>
+                    </div>
+                    <div>
+                      <dt>Discussed at Shift Huddles</dt>
+                      <dd>{note.shiftHuddles || 'Not listed'}</dd>
+                    </div>
+                    <div>
+                      <dt>Follow Up Needed</dt>
+                      <dd>
+                        {note.followUpNotes ||
+                          note.followUpNeeded ||
+                          'Not listed'}
+                      </dd>
                     </div>
                   </dl>
                 </article>
