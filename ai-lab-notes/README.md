@@ -12,6 +12,7 @@ The app is intentionally small and local-only. It does not use external APIs, pa
 - Delete controls for individual notes
 - A clear-all control for saved notes
 - A med clean date tracker
+- A CHO curve completed date tracker
 
 ## Install Steps
 

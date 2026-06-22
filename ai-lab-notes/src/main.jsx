@@ -17,6 +17,10 @@ const initialMedCleanDates = {
   rawMaterialsLab: '',
 };
 
+const initialChoCurveDate = {
+  date: '',
+};
+
 const monthNames = [
   'January',
   'February',
@@ -49,6 +53,9 @@ function App() {
   const [medCleanDates, setMedCleanDates] = useState(() =>
     loadFromStorage('ai-lab-med-clean-dates', initialMedCleanDates),
   );
+  const [choCurveDate, setChoCurveDate] = useState(() =>
+    loadFromStorage('ai-lab-cho-curve-date', initialChoCurveDate),
+  );
   const [calendarDate, setCalendarDate] = useState(() => new Date());
   const [calendarTasks, setCalendarTasks] = useState(() =>
     loadFromStorage('ai-lab-calendar-tasks', {}),
@@ -69,6 +76,13 @@ function App() {
       JSON.stringify(medCleanDates),
     );
   }, [medCleanDates]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      'ai-lab-cho-curve-date',
+      JSON.stringify(choCurveDate),
+    );
+  }, [choCurveDate]);
 
   useEffect(() => {
     localStorage.setItem(
@@ -159,6 +173,14 @@ function App() {
 
   function clearMedCleanDates() {
     setMedCleanDates(initialMedCleanDates);
+  }
+
+  function updateChoCurveDate(event) {
+    setChoCurveDate({ date: event.target.value });
+  }
+
+  function clearChoCurveDate() {
+    setChoCurveDate(initialChoCurveDate);
   }
 
   function goToPreviousMonth() {
@@ -545,6 +567,38 @@ function App() {
               name="rawMaterialsLab"
               value={medCleanDates.rawMaterialsLab}
               onChange={updateMedCleanDate}
+            />
+          </label>
+        </div>
+      </section>
+
+      <section className="card">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Routine tracking</p>
+            <h2>CHO Curve Completed</h2>
+          </div>
+          <button
+            className="secondary-button"
+            type="button"
+            onClick={clearChoCurveDate}
+            disabled={choCurveDate.date === ''}
+          >
+            Clear Date
+          </button>
+        </div>
+
+        <div className="med-clean-list">
+          <label className="med-clean-item">
+            <span>
+              <strong>CHO Curve Completed</strong>
+              <small>Date completed</small>
+            </span>
+            <input
+              type="date"
+              name="choCurveDate"
+              value={choCurveDate.date}
+              onChange={updateChoCurveDate}
             />
           </label>
         </div>
