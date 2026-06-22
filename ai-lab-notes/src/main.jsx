@@ -288,12 +288,12 @@ function App() {
             </label>
 
             <label className="wide-field">
-              Observation
+              Completed Tasks
               <textarea
                 name="observation"
                 value={formData.observation}
                 onChange={updateFormField}
-                placeholder="Write a short fictional observation."
+                placeholder="Write the completed tasks for this shift."
                 rows="4"
                 required
               />
@@ -375,7 +375,7 @@ function App() {
                   </div>
                   <dl>
                     <div>
-                      <dt>Observation</dt>
+                      <dt>Completed Tasks</dt>
                       <dd>{note.observation}</dd>
                     </div>
                     <div>
